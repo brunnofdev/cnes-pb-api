@@ -31,12 +31,15 @@ def save_to_postgres(df, table_name):
     conn.close()
 
 # Função principal do pipeline
-def processar_cnes_em_chunks(input_csv, chunk_size=50000, dry_run=True):
+def processar_cnes_em_chunks(input_csv, output_csv, chunk_size=50000, dry_run=False):
     """
     Processa o CSV do CNES em chunks.
     dry_run=True: apenas imprime os resultados (para testes)
     dry_run=False: insere os dados no PostgreSQL
     """
+
+    primeiro = True
+
     for chunk in pd.read_csv(input_csv, sep=';', dtype=str, chunksize=chunk_size, encoding='latin1'):
         # 1. Padroniza nomes de colunas
         chunk = padronizar_colunas(chunk)
@@ -54,14 +57,26 @@ def processar_cnes_em_chunks(input_csv, chunk_size=50000, dry_run=True):
             continue  # não salva no banco se dry_run=True
         # Inserção no PostgreSQL
         if not chunk.empty:
+            chunk.to_csv(
+                output_csv,
+                mode="w" if primeiro else "a",
+                sep=';',
+                index=False,
+                header=primeiro
+            )
+            primeiro = False
+
+        if not chunk.empty:
             save_to_postgres(chunk, "hospitais_pb")
+            
 
 # Execução
 def main():
     processar_cnes_em_chunks(
         input_csv="data/raw/teste.csv",  # altere se quiser usar teste.csv
+        output_csv="data/processed/hospitais_pb.csv",
         chunk_size=50000,
-        dry_run=True  # True para teste, False para salvar no banco
+        dry_run=False  # True para teste, False para salvar no banco
     )
 
 if __name__ == "__main__":
