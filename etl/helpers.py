@@ -1,5 +1,6 @@
 import pandas as pd
-# 1. Padroniza nomes de colunas
+
+# Padronização dos nomes de colunas
 def padronizar_colunas(df: pd.DataFrame) -> pd.DataFrame:
     df.columns = (
         df.columns
@@ -10,51 +11,20 @@ def padronizar_colunas(df: pd.DataFrame) -> pd.DataFrame:
     )
     return df
 
-# 2. Limpeza básica de strings
 
+# Limpeza das strings
 def limpar_strings(df: pd.DataFrame) -> pd.DataFrame:
     for col in df.select_dtypes(include='object').columns:
-
-        df[col] = df[col].astype(str).str.strip().replace({'': None})
-
+        # Remover aspas duplas
+        df[col] = df[col].astype(str).str.replace('"', '').str.strip()
+        # Converter vazios e 'nan' para None
+        df[col] = df[col].replace({'': None, 'nan': None, 'NaN': None})
     return df
 
-# 3. Filtro específico: hospitais da Paraíba
-
+# Filtro dos hospitais da Paraíba
 def filtrar_hospitais_pb(df: pd.DataFrame) -> pd.DataFrame:
-
-    # Ajuste conforme sua coluna que indica UF
-
-    if 'uf' in df.columns:
-
-        df = df[df['uf'].str.upper() == 'PB']
-
-    # Ajuste conforme sua coluna que indica tipo de estabelecimento
-
-    if 'tipo_estabelecimento' in df.columns:
-
-        df = df[df['tipo_estabelecimento'].str.lower().str.contains('hospital')]
-
-    return df
-
-# 4. Separação e padronização de endereço
-def separar_endereco(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Garante que o endereço esteja separado em colunas:
-    logradouro, numero, bairro, cep.
-    """
-    if 'endereco' in df.columns:
-        endereco_split = df['endereco'].str.split(',', expand=True)
-
-        if endereco_split.shape[1] >= 4:
-            df['logradouro'] = endereco_split[0].str.strip()
-            df['numero'] = endereco_split[1].str.strip()
-            df['bairro'] = endereco_split[2].str.strip()
-            df['cep'] = endereco_split[3].str.strip()
-        df.drop(columns=['endereco'], inplace=True)
-    else:
-        # Caso já existam colunas separadas, apenas garantir limpeza
-        for col in ['logradouro', 'numero', 'bairro', 'cep']:
-            if col in df.columns:
-                df[col] = df[col].astype(str).str.strip()
+    # O código IBGE da Paraíba é 25
+    if 'co_uf' in df.columns:
+        # Filtra tanto '25' quanto 'PB' para garantir
+        df = df[df['co_uf'].astype(str).str.upper().isin(['25', 'PB'])]
     return df
