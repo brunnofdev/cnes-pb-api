@@ -1,16 +1,27 @@
+import os
+from dotenv import load_dotenv
 import pandas as pd
 import psycopg2
 from .helpers import padronizar_colunas, limpar_strings, filtrar_hospitais_pb, separar_endereco
+
+# Carregar variáveis do .env
+load_dotenv()
+
+PG_HOST = os.getenv("DB_HOST")
+PG_PORT = int(os.getenv("DB_PORT", 5432))
+PG_DB = os.getenv("DB_NAME")
+PG_USER = os.getenv("DB_USER")
+PG_PASSWORD = os.getenv("DB_PASS")
 
 # Funções de banco de dados
 def save_to_postgres(df, table_name):
     """Insere um DataFrame diretamente no PostgreSQL."""
     conn = psycopg2.connect(
-        host="localhost",
-        port=5433,  # ajuste conforme seu Docker
-        database="cnes",
-        user="postgres",
-        password="postgres"
+        host=PG_HOST,
+        port=PG_PORT,
+        database=PG_DB,
+        user=PG_USER,
+        password=PG_PASSWORD
     )
     cur = conn.cursor()
     for _, row in df.iterrows():
@@ -30,14 +41,14 @@ def save_to_postgres(df, table_name):
     cur.close()
     conn.close()
 
+
 # Função principal do pipeline
 def processar_cnes_em_chunks(input_csv, output_csv, chunk_size=50000, dry_run=False):
     """
     Processa o CSV do CNES em chunks.
     dry_run=True: apenas imprime os resultados (para testes)
-    dry_run=False: insere os dados no PostgreSQL
+    dry_run=False: insere os dados no PostgreSQL e salva CSV
     """
-
     primeiro = True
 
     for chunk in pd.read_csv(input_csv, sep=';', dtype=str, chunksize=chunk_size, encoding='latin1'):
@@ -49,13 +60,15 @@ def processar_cnes_em_chunks(input_csv, output_csv, chunk_size=50000, dry_run=Fa
         chunk = filtrar_hospitais_pb(chunk)
         # 4. Normalização / padronização de endereço
         chunk = separar_endereco(chunk)
+
         # Dry-run: apenas visualizar
         if dry_run:
             print("\n=== Pré-visualização do chunk transformado ===")
             print(chunk.head())
             print(f"Linhas restantes no chunk: {len(chunk)}")
-            continue  # não salva no banco se dry_run=True
-        # Inserção no PostgreSQL
+            continue
+
+        # Salva CSV incremental
         if not chunk.empty:
             chunk.to_csv(
                 output_csv,
@@ -66,18 +79,20 @@ def processar_cnes_em_chunks(input_csv, output_csv, chunk_size=50000, dry_run=Fa
             )
             primeiro = False
 
+        # Inserção no PostgreSQL
         if not chunk.empty:
             save_to_postgres(chunk, "hospitais_pb")
-            
+
 
 # Execução
 def main():
     processar_cnes_em_chunks(
-        input_csv="data/raw/teste.csv",  # altere se quiser usar teste.csv
+        input_csv="data/raw/teste.csv",
         output_csv="data/processed/hospitais_pb.csv",
         chunk_size=50000,
-        dry_run=False  # True para teste, False para salvar no banco
+        dry_run=False
     )
+
 
 if __name__ == "__main__":
     main()
