@@ -2,7 +2,8 @@ import os
 from dotenv import load_dotenv
 import pandas as pd
 import psycopg2
-from .helpers import padronizar_colunas, limpar_strings, filtrar_hospitais_pb, separar_endereco
+from helpers import padronizar_colunas, limpar_strings, filtrar_hospitais_pb, separar_endereco
+from path import data_raw, data_processed
 
 # Carregar variáveis do .env
 load_dotenv()
@@ -87,8 +88,8 @@ def processar_cnes_em_chunks(input_csv, output_csv, chunk_size=50000, dry_run=Fa
 # Execução
 def main():
     processar_cnes_em_chunks(
-        input_csv="data/raw/teste.csv",
-        output_csv="data/processed/hospitais_pb.csv",
+        input_csv= data_raw,
+        output_csv=data_processed,
         chunk_size=50000,
         dry_run=False
     )
