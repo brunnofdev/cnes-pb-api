@@ -1,1 +1,17 @@
 /.env
+.env
+.venv/
+venv/
+env/
+
+.idea/
+
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+data/raw/
+data/processed/
+*.db
+*.sqlite3
