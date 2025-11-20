@@ -2,7 +2,8 @@ import os
 from dotenv import load_dotenv
 import pandas as pd
 import psycopg2
-from helpers import padronizar_colunas, limpar_strings, filtrar_hospitais_pb, separar_endereco
+from etl.helpers import separar_endereco, filtrar_hospitais_pb, limpar_strings, padronizar_colunas
+
 from path import data_raw, data_processed
 
 # Carregar variáveis do .env
@@ -94,6 +95,3 @@ def main():
         dry_run=False
     )
 
-
-if __name__ == "__main__":
-    main()

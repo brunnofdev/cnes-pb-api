@@ -1,5 +1,6 @@
 import uvicorn
 from fastapi import FastAPI
+import etl.pipeline as pipeline
 
 app = FastAPI()
 
@@ -14,3 +15,4 @@ async def say_hello(name: str):
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)
+    pipeline.main()
