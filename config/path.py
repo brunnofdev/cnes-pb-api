@@ -1,8 +1,8 @@
 from pathlib import Path
 
-ROOT_DIR = Path(__file__).parent.resolve()
+ROOT_DIR = Path(__file__).parent.parent.resolve()
 
-data_raw = Path(ROOT_DIR / "data" / "raw" / "teste.csv")
+data_raw = Path(ROOT_DIR / "data" / "raw" / "cnes_estabelecimentos.csv")
 data_processed = Path(ROOT_DIR / "data" / "processed" / "hospitais_pb.csv")
 
 

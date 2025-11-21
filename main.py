@@ -1,18 +1,23 @@
-import uvicorn
-from fastapi import FastAPI
-import etl.pipeline as pipeline
+import sys
+from etl.pipeline import processar_cnes_em_chunks
+from config.path import data_raw, data_processed
 
-app = FastAPI()
+def main():
+    print("Iniciando Pipeline de Dados CNES-PB")
 
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
-
-
-@app.get("/hello/{name}")
-async def say_hello(name: str):
-    return {"message": f"Hello {name}"}
+    # Configurações de execução
+    # Mude dry_run=True para teste e leitura sem gravar no banco
+    processar_cnes_em_chunks(
+        input_csv=data_raw,
+        output_csv=data_processed,
+        chunk_size=50000,
+        dry_run=False 
+    )
+    print("Pipeline finalizado")
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=8000)
-    pipeline.main()
+    try:
+        main()
+    except Exception as e:
+        print(f"\nErro fatal no pipeline: {e}")
+        sys.exit(1)
