@@ -1,8 +1,10 @@
 import pandas as pd
 from etl.helpers import padronizar_colunas, limpar_strings, filtrar_hospitais_pb
-from etl.loader import carregar_staging, executar_normalizacao
+from etl.loader import carregar_staging, executar_normalizacao, limpar_staging
 
 def run_pipeline(input_csv, output_csv, chunk_size=50000):
+
+    limpar_staging()
 
     chunks = pd.read_csv(
         input_csv, sep=';', dtype=str, chunksize=chunk_size, 

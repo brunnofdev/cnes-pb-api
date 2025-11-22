@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS hospitais_raw (
+CREATE TABLE IF NOT EXISTS stg_hospitais_raw (
     co_cnes VARCHAR(20),
     no_fantasia VARCHAR(255),
     nu_cnpj_mantenedora VARCHAR(50),

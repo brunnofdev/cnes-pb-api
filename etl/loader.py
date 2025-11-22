@@ -58,3 +58,15 @@ def carregar_staging(df: pd.DataFrame):
 def executar_normalizacao():
     # script de normalização (distribuição para tabelas finais)
     executar_script_sql(sql_normalize)
+
+# Função para limpar a tabela de staging antes de carregar novos dados
+def limpar_staging():
+    conn = get_conn()
+    try:
+        with conn.cursor() as cur:
+            cur.execute("TRUNCATE TABLE stg_hospitais_raw")
+            conn.commit()
+    except Exception as e:
+        print(e)
+    finally:
+        conn.close()
