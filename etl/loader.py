@@ -81,7 +81,7 @@ def verificar_tabela(nome_tabela):
             resultado = cur.fetchone()
 
             if (resultado is not None):
-                print("Tabela já existe")
+                print("Leitura das tabelas concluída!")
                 return True
 
     except Exception as e:
