@@ -70,3 +70,23 @@ def limpar_staging():
         print(e)
     finally:
         conn.close()
+
+def verificar_tabela(nome_tabela):
+
+    conn = get_conn()  # Usa sua função de conexão existente
+    try:
+        with conn.cursor() as cur:
+            # Query super rápida: Tenta pegar só o primeiro registro
+            cur.execute(f"SELECT 1 FROM {nome_tabela} LIMIT 1")
+            resultado = cur.fetchone()
+
+            if (resultado is not None):
+                print("Tabela já existe")
+                return True
+
+    except Exception as e:
+        print(f"Tabela inexistente ou inacessível")
+        return False
+
+    finally:
+        conn.close()
