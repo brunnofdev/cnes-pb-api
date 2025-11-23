@@ -1,7 +1,8 @@
 import psycopg2
 import psycopg2.extras
 import pandas as pd
-from config.path import sql_rawTable, sql_normalize, sql_tables
+from etl.helpers import remover_acentos
+from config.path import sql_rawTable, sql_normalize, sql_tables, cidades_json
 from config.database import PG_CONFIG
 
 def get_conn():
@@ -73,10 +74,10 @@ def limpar_staging():
 
 def verificar_tabela(nome_tabela):
 
-    conn = get_conn()  # Usa sua função de conexão existente
+    conn = get_conn()
     try:
         with conn.cursor() as cur:
-            # Query super rápida: Tenta pegar só o primeiro registro
+            #Query que retorna apenas 1 linha
             cur.execute(f"SELECT 1 FROM {nome_tabela} LIMIT 1")
             resultado = cur.fetchone()
 
@@ -90,3 +91,23 @@ def verificar_tabela(nome_tabela):
 
     finally:
         conn.close()
+
+
+def carregar_mapa_cidades() -> dict:
+
+    try:
+        #cria dataframe com o arquivo
+        df = pd.read_json(cidades_json)
+
+        chaves = df['nome'].apply(remover_acentos) #Normaliza os nomes
+        valores = df['id'].astype(str)
+
+        # Converte para o dicionário {NOME: ID}
+        mapa_cidades = dict(zip(chaves, valores))
+
+        print(f"Mapa de cidades carregado: {len(mapa_cidades)} municípios.")
+        return mapa_cidades
+
+    except Exception as e:
+        print(f"Erro ao ler cidades: {e}")
+        return {}
