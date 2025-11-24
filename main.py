@@ -35,7 +35,7 @@ app = FastAPI(title="API CNES Paraíba",
     description="Sistema de consulta de dados hospitalares normalizados.",
     version="1.0",
     lifespan=lifespan)
-app.include_router(api_router, prefix="/api/v1")
+app.include_router(api_router, prefix="")
 
 @app.get("/")
 async def root():

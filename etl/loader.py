@@ -100,7 +100,7 @@ def carregar_mapa_cidades() -> dict:
         df = pd.read_json(cidades_json)
 
         chaves = df['nome'].apply(remover_acentos) #Normaliza os nomes
-        valores = df['id'].astype(str)
+        valores = df['id'].astype(str).str.slice(0,6)
 
         # Converte para o dicionário {NOME: ID}
         mapa_cidades = dict(zip(chaves, valores))
