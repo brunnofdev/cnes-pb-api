@@ -36,6 +36,42 @@ def remover_acentos(texto: str) -> str:
     return ''.join(c for c in unicodedata.normalize('NFD', texto)
                   if unicodedata.category(c) != 'Mn').upper().strip()
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #Dicionário
 
 MAPA_TIPOS = {
